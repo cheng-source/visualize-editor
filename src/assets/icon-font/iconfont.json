@@ -1,0 +1,23 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "33576748",
+      "name": "Icon_undo",
+      "font_class": "Icon_undo",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "33576749",
+      "name": "Icon_refresh",
+      "font_class": "Icon_refresh",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    }
+  ]
+}

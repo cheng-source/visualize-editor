@@ -1,26 +1,27 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Editor :data = state></Editor>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import { reactive,provide } from 'vue'
+import Editor from './packages/editor.jsx'
+import data from './data.json'
+import {registerConfig as config}  from './util/editorConfig.jsx'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Editor
+  },
+  setup() {
+    const state = reactive(data);
+    provide("config", config)
+    return {
+      state
+    }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>

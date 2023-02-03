@@ -5,6 +5,7 @@ import { useMenuDragger } from './useMenuDragger';
 import { useFocus } from './useFocus';
 import { useBlockDragger } from './useBlockDragger';
 import { useCommand } from './useCommand';
+import {$Dialog} from '../components/dialog'
 export default defineComponent({
   props: {
     data: {type: Object}
@@ -53,8 +54,27 @@ export default defineComponent({
     let commands = useCommand(blocks);
   
     let buttons = [
-      {label: '撤销', icon: 'iconfont icon-Icon_undo', handler: commands.commands.undo},
-      {label: '重做', icon: 'iconfont icon-Icon_refresh', handler: commands.commands.redo}
+      {label: '撤销', icon: 'iconfont icon-undo', handler: commands.commands.undo},
+      {label: '重做', icon: 'iconfont icon-redo', handler: commands.commands.redo},
+      {label: '导入', icon: 'iconfont icon-Import', handler: ()=> {
+        $Dialog({
+          title: '导入',
+          content: '',
+          footer: true,
+          onConfirm: (text)=> {
+            // console.log(text)
+            // blocks.value = JSON.parse(text) // 这样写没法撤销前进
+            commands.commands.updateBlocks(JSON.parse(text))
+          }
+        })
+      }},
+      {label: '导出', icon: 'iconfont icon-export', handler: ()=> {        
+        $Dialog({
+          title: '导出',
+          content: JSON.stringify(blocks.value),
+          
+        })
+      }},
     ];
 
     return () => <div class="editor">

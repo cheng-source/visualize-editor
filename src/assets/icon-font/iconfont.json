@@ -6,18 +6,32 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "33576748",
-      "name": "Icon_undo",
-      "font_class": "Icon_undo",
-      "unicode": "e603",
-      "unicode_decimal": 58883
+      "icon_id": "167455",
+      "name": "redo",
+      "font_class": "redo",
+      "unicode": "e627",
+      "unicode_decimal": 58919
     },
     {
-      "icon_id": "33576749",
-      "name": "Icon_refresh",
-      "font_class": "Icon_refresh",
-      "unicode": "e604",
-      "unicode_decimal": 58884
+      "icon_id": "167469",
+      "name": "undo",
+      "font_class": "undo",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    },
+    {
+      "icon_id": "4765958",
+      "name": "export",
+      "font_class": "export",
+      "unicode": "e791",
+      "unicode_decimal": 59281
+    },
+    {
+      "icon_id": "4765960",
+      "name": "Import",
+      "font_class": "Import",
+      "unicode": "e792",
+      "unicode_decimal": 59282
     }
   ]
 }

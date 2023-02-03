@@ -12,12 +12,9 @@ export function useCommand(blocks) {
 
     const registry = (command) => {
         state.commandArray.push(command);
-        state.commands[command.name] = () => {
+        state.commands[command.name] = (args1) => {
             let { queue, current } = state;
-            const { redo, undo, } = command.execute();
-            // if (queue.length === 2) {
-            //     queue.forEach(obj => obj.redo())
-            // }
+            const { redo, undo, } = command.execute(args1);
             redo();
             if (!command.pushQueue) {
                 return
@@ -90,8 +87,6 @@ export function useCommand(blocks) {
         execute() {
             let before = this.before;
             let after = blocks.value;
-            console.log(blocks.value);
-            console.log(after);
             // debugger
             return {
                 redo() {
@@ -105,6 +100,27 @@ export function useCommand(blocks) {
             }
         }
     });
+
+    registry({
+        name: 'updateBlocks',
+        pushQueue: true,
+        execute(newVal) {
+            console.log(newVal);
+            let before = deepcopy(blocks.value);
+            let after = newVal;
+            // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
+
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
     const keyBoardEvent = (() => {
         const keyCodes = {
             89: 'y',

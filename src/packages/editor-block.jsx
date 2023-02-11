@@ -1,4 +1,4 @@
-import {computed, defineComponent, inject, ref,onMounted} from 'vue';
+import {computed, defineComponent, inject, ref,onMounted, watch} from 'vue';
 export default defineComponent({
   props: {
     block: {type: Object}
@@ -11,12 +11,9 @@ export default defineComponent({
     }));
 
     const config = inject("config");
-    const render = config.editorConfigMap.get(props.block.key).render();
-  
 
     const blockRef = ref(null);
     onMounted(()=> {
-      
       let {offsetWidth, offsetHeight} = blockRef.value;
       if (props.block.alignCenter) {
         // 拖拽到目标元素上后使拖拽元素以鼠标为中心
@@ -29,7 +26,7 @@ export default defineComponent({
     })
     return ()=> 
     <div class="editor-block" style={blockStyle.value} ref={blockRef}>
-        {render}
+        {config.editorConfigMap.get(props.block.key).render()}
     </div>
   }
 }) 

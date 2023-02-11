@@ -1,7 +1,7 @@
 import deepcopy from 'deepcopy';
 import { events } from './event';
 import { onUnmounted } from 'vue'
-export function useCommand(blocks) {
+export function useCommand(blocks, focusData) {
     const state = {
         current: -1,
         queue: [],
@@ -12,9 +12,9 @@ export function useCommand(blocks) {
 
     const registry = (command) => {
         state.commandArray.push(command);
-        state.commands[command.name] = (args1) => {
+        state.commands[command.name] = (...args1) => {
             let { queue, current } = state;
-            const { redo, undo, } = command.execute(args1);
+            const { redo, undo, } = command.execute(...args1);
             redo();
             if (!command.pushQueue) {
                 return
@@ -100,19 +100,166 @@ export function useCommand(blocks) {
             }
         }
     });
-
+    // 菜单栏上的导入更新
     registry({
-        name: 'updateBlocks',
+            name: 'updateBlocks',
+            pushQueue: true,
+            execute(newVal) {
+                let before = deepcopy(blocks.value);
+                let after = newVal;
+                // debugger
+                return {
+                    redo() {
+                        blocks.value = deepcopy(after);
+
+                    },
+                    undo() {
+                        blocks.value = deepcopy(before);
+                    }
+                }
+            }
+        })
+        // 单个组件的更新
+    registry({
+        name: 'updateBlock',
         pushQueue: true,
-        execute(newVal) {
-            console.log(newVal);
+        execute(newBlock, oldBlock) {
             let before = deepcopy(blocks.value);
-            let after = newVal;
+            let after = (() => {
+                let newBlocks = [...blocks.value];
+                const index = newBlocks.indexOf(oldBlock);
+                if (index > -1) {
+                    newBlocks.splice(index, 1, newBlock)
+                }
+                return newBlocks;
+            })();
             // debugger
             return {
                 redo() {
                     blocks.value = deepcopy(after);
 
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
+    registry({
+        name: 'toTop',
+        pushQueue: true,
+        execute() {
+            let before = deepcopy(blocks.value);
+            let after = (() => {
+                let maxZIndex = 0;
+                let { focus, unfocused } = focusData.value;
+                // 置顶就是在所有的未选中的block中找到最大的，然后选中的block都比最大的大1
+                unfocused.forEach(block => {
+                    if (block.zIndex > maxZIndex) {
+                        maxZIndex = block.zIndex;
+                    }
+                })
+                focus.forEach(block => {
+                    block.zIndex = maxZIndex + 1;
+                })
+                return blocks.value;
+            })();
+            // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
+    registry({
+        name: 'toBottom',
+        pushQueue: true,
+        execute() {
+            let before = deepcopy(blocks.value);
+            let after = (() => {
+                let minZIndex = Infinity;
+                let { focus, unfocused } = focusData.value;
+                // 置底就是在所有的未选中的block中找到最小的，然后选中的block都比最大的大1
+                unfocused.forEach(block => {
+                    if (block.zIndex < minZIndex) {
+                        minZIndex = block.zIndex;
+                    }
+                })
+                minZIndex = minZIndex - 1;
+                if (minZIndex < 0) {
+                    const dur = Math.abs(minZIndex);
+                    minZIndex = 0;
+                    unfocused.forEach(block => block.zIndex += dur);
+                }
+                focus.forEach(block => {
+                    block.zIndex = minZIndex;
+                })
+                return blocks.value;
+            })();
+            // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
+    registry({
+        name: 'delete',
+        pushQueue: true,
+        execute() {
+            let before = deepcopy(blocks.value);
+            let after = focusData.value.unfocused
+                // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
+    registry({
+        name: 'preView',
+        pushQueue: true,
+        execute() {
+            let before = deepcopy(blocks.value);
+            let after = focusData.value.unfocused
+                // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
+                },
+                undo() {
+                    blocks.value = deepcopy(before);
+                }
+            }
+        }
+    })
+
+    registry({
+        name: 'close',
+        pushQueue: true,
+        execute() {
+            let before = deepcopy(blocks.value);
+            let after = focusData.value.unfocused
+                // debugger
+            return {
+                redo() {
+                    blocks.value = deepcopy(after);
                 },
                 undo() {
                     blocks.value = deepcopy(before);
@@ -153,8 +300,6 @@ export function useCommand(blocks) {
     })();
 
     (() => {
-        // debugger
-        console.log('a');
         state.destroyArray.push(keyBoardEvent())
         state.commandArray.forEach(command => command.init && state.destroyArray.push(command.init()));
     })()

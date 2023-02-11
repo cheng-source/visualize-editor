@@ -122,6 +122,12 @@
     }
 }
 
+.block-editing {
+    &::after {
+        display: none;
+    }
+}
+
 .block-focus {
     &::after {
         border: 2px dashed red;
@@ -144,4 +150,24 @@
 
 .dialog_div {
     display: inline-block;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 2px 2px #ccc;
+}
+
+.dropdown-isShow {
+    display: block;
+}
+
+.menuItem {
+    line-height: 30px;
+    width: 100px;
+    user-select: none;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    cursor: pointer;
 }

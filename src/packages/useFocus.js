@@ -1,5 +1,5 @@
 import { computed, reactive, ref } from 'vue';
-export function useFocus(blocks, callback) {
+export function useFocus(blocks, preViewRef, callback) {
     // 获取哪些元素被选中
     const focusData = computed(() => {
         let focus = [];
@@ -17,11 +17,10 @@ export function useFocus(blocks, callback) {
     }
 
     const blockMousedown = (e, block, index) => {
+        if (preViewRef.value) return;
         e.preventDefault();
         e.stopPropagation();
         // 按住shift键可以连续选中
-
-
         if (e.shiftKey) {
             if (focusData.value.focus.length <= 1) {
                 block.focus = true;

@@ -8,6 +8,7 @@ import { useCommand } from './useCommand';
 import {$Dialog} from '../components/dialog';
 import {$dropdown} from '../components/contextMenu'
 import {MenuItem} from '../components/menuItem'
+import {EditorOperate} from '../components/editorOperate'
 import { ElButton} from "element-plus";
 
 export default defineComponent({
@@ -141,7 +142,9 @@ export default defineComponent({
                     </div>
                      <div ><ElButton  onClick={() => {closeRef.value = false}}>继续编辑</ElButton></div>
                      </>
-                    :                  
+
+                    :
+
                     <div class="editor">
                       {/* 左侧物料区 */}
                       <div class="editor-left">
@@ -170,7 +173,11 @@ export default defineComponent({
                           </div>
                         })}
                       </div>
-                      <div class="editor-right"></div>
+                      {/* 右侧 */}
+                      <div class="editor-right">
+                        <EditorOperate block={lastSelectBlock.value}></EditorOperate>
+                      </div>
+                      {/* 内容区 */}
                       <div class="editor-container">
                           {/* 产生滚动条 */}
                           <div class="editor-container-canvas">
@@ -184,7 +191,7 @@ export default defineComponent({
                             >
                               {
                                 (blocks.value.map((block,index) => (
-                                  <EditorBlock 
+                                  <EditorBlock
                                   class = {block.focus ? 'block-focus' : ''}
                                   class = {preViewRef.value ? 'block-editing' : ''} // 为什么能覆盖editor-block的::after样式?
                                   block = {block}

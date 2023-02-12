@@ -10,7 +10,6 @@ export function useFocus(blocks, preViewRef, callback) {
     let selectIndex = ref(-1);
     // 最后选中的元素
     const lastSelectBlock = computed(() => blocks.value[selectIndex.value]);
-
     // 清空选中的元素
     const clearFocus = () => {
         blocks.value.forEach(block => block.focus = false)

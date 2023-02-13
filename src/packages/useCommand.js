@@ -1,7 +1,7 @@
 import deepcopy from 'deepcopy';
 import { events } from './event';
 import { onUnmounted } from 'vue'
-export function useCommand(blocks, focusData) {
+export function useCommand(data, focusData) {
     const state = {
         current: -1,
         queue: [],
@@ -11,67 +11,69 @@ export function useCommand(blocks, focusData) {
     }
 
     const registry = (command) => {
-        state.commandArray.push(command);
-        state.commands[command.name] = (...args1) => {
-            let { queue, current } = state;
-            const { redo, undo, } = command.execute(...args1);
-            redo();
-            if (!command.pushQueue) {
-                return
-            }
-
-            if (queue.length > 0) {
-                queue = queue.slice(0, current + 1);
-                state.queue = queue;
-            }
-            queue.push({ redo, undo });
-
-            state.current = current + 1;
-        };
-    }
-
-    registry({
-        name: 'redo',
-        keyBoard: 'ctrl+y',
-        execute() {
-            return {
-                redo() {
-                    // debugger
-                    let item = state.queue[state.current + 1];
-                    if (item) {
-                        item.redo && item.redo();
-                        state.current++;
-                    }
+            state.commandArray.push(command);
+            state.commands[command.name] = (...args1) => {
+                let { queue, current } = state;
+                const { redo, undo, } = command.execute(...args1);
+                redo();
+                if (!command.pushQueue) {
+                    return
                 }
-            }
-        }
 
-    })
+                if (queue.length > 0) {
+                    queue = queue.slice(0, current + 1);
+                    state.queue = queue;
+                }
+                queue.push({ redo, undo });
+
+                state.current = current + 1;
+            };
+        }
+        // 重做
     registry({
-        name: 'undo',
-        keyBoard: 'ctrl+z',
-        execute() {
-            return {
-                redo() {
-                    if (state.current === -1) return;
-                    let item = state.queue[state.current];
-                    if (item) {
+            name: 'redo',
+            keyBoard: 'ctrl+y',
+            execute() {
+                return {
+                    redo() {
                         // debugger
-                        item.undo && item.undo();
-                        state.current--;
+                        let item = state.queue[state.current + 1];
+                        if (item) {
+                            item.redo && item.redo();
+                            state.current++;
+                        }
                     }
                 }
             }
-        }
 
-    })
+        })
+        // 撤销
+    registry({
+            name: 'undo',
+            keyBoard: 'ctrl+z',
+            execute() {
+                return {
+                    redo() {
+                        if (state.current === -1) return;
+                        let item = state.queue[state.current];
+                        if (item) {
+                            // debugger
+                            item.undo && item.undo();
+                            state.current--;
+                        }
+                    }
+                }
+            }
+
+        })
+        // 拖拽
     registry({
         name: 'drag',
         pushQueue: true,
         init() {
             this.before = null;
             const start = () => {
-                this.before = deepcopy(blocks.value);
+                this.before = deepcopy(data.value);
             }
             const end = () => {
                 // debugger
@@ -86,47 +88,46 @@ export function useCommand(blocks, focusData) {
         },
         execute() {
             let before = this.before;
-            let after = blocks.value;
+            let after = data.value;
             // debugger
             return {
                 redo() {
-                    blocks.value = deepcopy(after);
-                    // 下面这种写法的问题是：blocks指向的地址与after相同，之后修改blocks的值会影响after。
-                    // blocks.value = after; 
+                    data.value = after;
                 },
                 undo() {
-                    blocks.value = before;
+                    data.value = before;
                 }
             }
         }
     });
-    // 菜单栏上的导入更新
+
+    // 更新整个容器
     registry({
-            name: 'updateBlocks',
+            name: 'updateContainer',
             pushQueue: true,
             execute(newVal) {
-                let before = deepcopy(blocks.value);
+                let before = data.value;
                 let after = newVal;
                 // debugger
                 return {
                     redo() {
-                        blocks.value = deepcopy(after);
+                        data.value = after;
 
                     },
                     undo() {
-                        blocks.value = deepcopy(before);
+                        data.value = before;
                     }
                 }
             }
         })
-        // 单个组件的更新
+        // 更新单个组件
     registry({
         name: 'updateBlock',
         pushQueue: true,
         execute(newBlock, oldBlock) {
-            let before = deepcopy(blocks.value);
+            let before = deepcopy(data.value);
             let after = (() => {
-                let newBlocks = [...blocks.value];
+                let newBlocks = [...data.value.blocks];
                 const index = newBlocks.indexOf(oldBlock);
                 if (index > -1) {
                     newBlocks.splice(index, 1, newBlock)
@@ -136,21 +137,22 @@ export function useCommand(blocks, focusData) {
             // debugger
             return {
                 redo() {
-                    blocks.value = deepcopy(after);
+                    blocks.value = {...data.value, blocks: after };
 
                 },
                 undo() {
-                    blocks.value = deepcopy(before);
+                    blocks.value = before;
                 }
             }
         }
     })
 
+    // 置顶
     registry({
         name: 'toTop',
         pushQueue: true,
         execute() {
-            let before = deepcopy(blocks.value);
+            let before = deepcopy(data.value);
             let after = (() => {
                 let maxZIndex = 0;
                 let { focus, unfocused } = focusData.value;
@@ -163,25 +165,26 @@ export function useCommand(blocks, focusData) {
                 focus.forEach(block => {
                     block.zIndex = maxZIndex + 1;
                 })
-                return blocks.value;
+                return data.value;
             })();
             // debugger
             return {
                 redo() {
-                    blocks.value = deepcopy(after);
+                    data.value = after;
                 },
                 undo() {
-                    blocks.value = deepcopy(before);
+                    data.value = before;
                 }
             }
         }
     })
 
+    // 置底
     registry({
         name: 'toBottom',
         pushQueue: true,
         execute() {
-            let before = deepcopy(blocks.value);
+            let before = deepcopy(data.value);
             let after = (() => {
                 let minZIndex = Infinity;
                 let { focus, unfocused } = focusData.value;
@@ -200,69 +203,34 @@ export function useCommand(blocks, focusData) {
                 focus.forEach(block => {
                     block.zIndex = minZIndex;
                 })
-                return blocks.value;
+                return data.value;
             })();
             // debugger
             return {
                 redo() {
-                    blocks.value = deepcopy(after);
+                    data.value = after;
                 },
                 undo() {
-                    blocks.value = deepcopy(before);
+                    data.value = before;
                 }
             }
         }
     })
 
+    // 删除
     registry({
         name: 'delete',
         pushQueue: true,
         execute() {
-            let before = deepcopy(blocks.value);
+            let before = deepcopy(data.value);
             let after = focusData.value.unfocused
                 // debugger
             return {
                 redo() {
-                    blocks.value = deepcopy(after);
+                    data.value = after;
                 },
                 undo() {
-                    blocks.value = deepcopy(before);
-                }
-            }
-        }
-    })
-
-    registry({
-        name: 'preView',
-        pushQueue: true,
-        execute() {
-            let before = deepcopy(blocks.value);
-            let after = focusData.value.unfocused
-                // debugger
-            return {
-                redo() {
-                    blocks.value = deepcopy(after);
-                },
-                undo() {
-                    blocks.value = deepcopy(before);
-                }
-            }
-        }
-    })
-
-    registry({
-        name: 'close',
-        pushQueue: true,
-        execute() {
-            let before = deepcopy(blocks.value);
-            let after = focusData.value.unfocused
-                // debugger
-            return {
-                redo() {
-                    blocks.value = deepcopy(after);
-                },
-                undo() {
-                    blocks.value = deepcopy(before);
+                    data.value = before;
                 }
             }
         }
@@ -277,7 +245,6 @@ export function useCommand(blocks, focusData) {
             const { ctrlKey, keyCode } = e;
             let keyString = [] // 用来存储按过的键
             if (ctrlKey) {
-                // console.log(keyCode);
                 keyString.push('ctrl');
             }
             keyString.push(keyCodes[keyCode]);

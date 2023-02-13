@@ -10,26 +10,31 @@ import {$dropdown} from '../components/contextMenu'
 import {MenuItem} from '../components/menuItem'
 import {EditorOperate} from '../components/editorOperate'
 import { ElButton} from "element-plus";
+import deepcopy from 'deepcopy';
 
 export default defineComponent({
   props: {
-    data: {type: Object}
+    modelValue: {type: Object}
   },
-  setup(props) {
+  emits: ['update:modelValue'],
+  setup(props,ctx) {
     let preViewRef = ref(false); //预览标志
     let closeRef = ref(false);
-    const blocks = computed({
+    const data = computed({
       get() {
-        return props.data.blocks
+        return props.modelValue
       },
       set(newVal) {
-        props.data.blocks = newVal
+        // props中的属性是只读的
+        // props.data = newVal
+        ctx.emit('update:modelValue', deepcopy(newVal));
       }
-    })
+    });
+
     let containerStyle = computed(() => {
       return {
-        width: props.data.container.width + 'px',
-        height: props.data.container.height + 'px'
+        width: data.value.container.width + 'px',
+        height: data.value.container.height + 'px'
       }
     });
 
@@ -38,21 +43,21 @@ export default defineComponent({
     const containerRef = ref(null);
 
     // 左侧菜单组件的拖拽
-    const {dragStart,dragend} = useMenuDragger(containerRef,blocks);
+    const {dragStart,dragend} = useMenuDragger(containerRef, data);
 
     
     // 获取焦点
-    const {blockMousedown,clearFocus,focusData, lastSelectBlock} = useFocus(blocks,preViewRef, (e) => {
+    const {blockMousedown,clearFocus,focusData, lastSelectBlock} = useFocus(data,preViewRef, (e) => {
       mousedown(e)
     })
 
     // 内容区组件的拖拽
-    const {mousedown, markLine} = useBlockDragger(focusData, lastSelectBlock, props.data);
+    const {mousedown, markLine} = useBlockDragger(focusData, lastSelectBlock, data);
 
     const containerMousedown = () => {
       clearFocus();
     }
-    let commands = useCommand(blocks,focusData);
+    let commands = useCommand(data, focusData);
     let buttons = [
       {label: '撤销', icon: 'iconfont icon-undo', handler: commands.commands.undo},
       {label: '重做', icon: 'iconfont icon-redo', handler: commands.commands.redo},
@@ -65,14 +70,14 @@ export default defineComponent({
             // console.log(text)
             // blocks.value = JSON.parse(text) // 这样写没法撤销前进
             // debugger
-            commands.commands.updateBlocks(JSON.parse(text))
+            commands.commands.updateContainer(JSON.parse(text))
           }
         })
       }},
       {label: '导出', icon: 'iconfont icon-export', handler: ()=> {        
         $Dialog({
           title: '导出',
-          content: JSON.stringify(blocks.value),
+          content: JSON.stringify(data.value),
         })
       }},
       {label: '置顶', icon: 'iconfont icon-top', handler: commands.commands.toTop},
@@ -128,7 +133,7 @@ export default defineComponent({
                      onMousedown={containerMousedown}
                      >
                        {
-                         (blocks.value.map((block,index) => (
+                         (data.value.blocks.map((block,index) => (
                            <EditorBlock 
                            class = {block.focus ? 'block-focus' : ''}
                            class = {preViewRef.value ? 'block-editing' : ''} // 为什么能覆盖editor-block的::after样式?
@@ -190,7 +195,7 @@ export default defineComponent({
                             onMousedown={containerMousedown}
                             >
                               {
-                                (blocks.value.map((block,index) => (
+                                (data.value.blocks.map((block,index) => (
                                   <EditorBlock
                                   class = {block.focus ? 'block-focus' : ''}
                                   class = {preViewRef.value ? 'block-editing' : ''} // 为什么能覆盖editor-block的::after样式?

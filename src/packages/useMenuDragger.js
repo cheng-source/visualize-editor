@@ -1,7 +1,7 @@
 import { events } from "./event";
 
 // 封装拖拽函数
-export function useMenuDragger(containerRef, blocks) {
+export function useMenuDragger(containerRef, data) {
     let currentComponent = null;
 
     const dragenter = (e) => {
@@ -16,24 +16,23 @@ export function useMenuDragger(containerRef, blocks) {
 
     };
     const drop = (e) => {
+        // 内部已经渲染的组件
+        let blocks = data.value.blocks;
         // 拖拽结束后添加一个组件
-        blocks.value.push({
-            top: e.offsetY,
-            left: e.offsetX,
-            zIndex: 1,
-            key: currentComponent.key,
-            alignCenter: true, // 拖拽的组件的标识，用来在拖拽到目标元素上后使拖拽元素以鼠标为中心
-        });
-        // blocks.value = [
-        //     ...blocks.value,
-        //     {
-        //         top: e.offsetY,
-        //         left: e.offsetX,
-        //         zIndex: 1,
-        //         key: currentComponent.key,
-        //         alignCenter: true, // 拖拽的组件的标识，用来在拖拽到目标元素上后使拖拽元素以鼠标为中心
-        //     }
-        // ]
+        data.value = {
+            ...data.value,
+            blocks: [
+                ...blocks,
+                {
+                    top: e.offsetY,
+                    left: e.offsetX,
+                    zIndex: 1,
+                    key: currentComponent.key,
+                    alignCenter: true, // 拖拽的组件的标识，用来在拖拽到目标元素上后使拖拽元素以鼠标为中心
+                }
+            ]
+        };
+        currentComponent = null;
     };
 
     const dragStart = (e, component) => {

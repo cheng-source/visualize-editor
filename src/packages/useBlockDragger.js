@@ -79,9 +79,8 @@ export function useBlockDragger(focusData, lastSelectBlock, data) {
 
                 [
                     ...focusData.value.unfocused,
-                    { top: 0, left: 0, width: data.container.width, height: data.container.height }
+                    { top: 0, left: 0, width: data.value.container.width, height: data.value.container.height }
                 ].forEach((ABlock) => {
-
                     const { top: Atop, left: ALeft, width: AWidth, height: AHeight } = ABlock
 
                     line.y.push({ lineTop: Atop, BShouldTop: Atop - BHeight })

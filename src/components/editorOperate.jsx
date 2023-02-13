@@ -13,7 +13,6 @@ export const EditorOperate = defineComponent({
 
     return () => {
       let content = [];
-      console.log(props.block);
       if (!props.block) {
         content.push(<>
           <ElFormItem label='容器宽度'>

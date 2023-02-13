@@ -137,11 +137,11 @@ export function useCommand(data, focusData) {
             // debugger
             return {
                 redo() {
-                    blocks.value = {...data.value, blocks: after };
+                    data.value = {...data.value, blocks: after };
 
                 },
                 undo() {
-                    blocks.value = before;
+                    data.value = before;
                 }
             }
         }

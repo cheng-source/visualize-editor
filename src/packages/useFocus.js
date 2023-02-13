@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 export function useFocus(data, preViewRef, callback) {
     // 获取哪些元素被选中
     const focusData = computed(() => {
@@ -12,9 +12,18 @@ export function useFocus(data, preViewRef, callback) {
 
     // 最后选中的元素
     const lastSelectBlock = computed(() => data.value.blocks[selectIndex.value]);
-    // 清空选中的元素
+    watch(lastSelectBlock, () => {
+            console.log(lastSelectBlock.value);
+        })
+        // 清空选中的元素
     const clearFocus = () => {
         data.value.blocks.forEach(block => block.focus = false);
+    }
+
+    const containerMousedown = () => {
+        if (preViewRef.value) return;
+        clearFocus();
+        selectIndex.value = -1;
     }
 
     const blockMousedown = (e, block, index) => {
@@ -43,6 +52,7 @@ export function useFocus(data, preViewRef, callback) {
         blockMousedown,
         clearFocus,
         focusData,
-        lastSelectBlock
+        lastSelectBlock,
+        containerMousedown
     }
 }

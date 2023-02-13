@@ -222,12 +222,13 @@ export function useCommand(data, focusData) {
         name: 'delete',
         pushQueue: true,
         execute() {
+            // debugger
             let before = deepcopy(data.value);
             let after = focusData.value.unfocused
                 // debugger
             return {
                 redo() {
-                    data.value = after;
+                    data.value = {...data.value, blocks: after };
                 },
                 undo() {
                     data.value = before;

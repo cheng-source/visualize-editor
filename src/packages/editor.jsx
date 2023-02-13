@@ -47,16 +47,14 @@ export default defineComponent({
 
     
     // 获取焦点
-    const {blockMousedown,clearFocus,focusData, lastSelectBlock} = useFocus(data,preViewRef, (e) => {
+    const {blockMousedown,clearFocus,focusData, lastSelectBlock, containerMousedown} = useFocus(data,preViewRef, (e) => {
       mousedown(e)
     })
 
     // 内容区组件的拖拽
     const {mousedown, markLine} = useBlockDragger(focusData, lastSelectBlock, data);
 
-    const containerMousedown = () => {
-      clearFocus();
-    }
+
     let commands = useCommand(data, focusData);
     let buttons = [
       {label: '撤销', icon: 'iconfont icon-undo', handler: commands.commands.undo},

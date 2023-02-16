@@ -14,7 +14,8 @@ import deepcopy from 'deepcopy';
 
 export default defineComponent({
   props: {
-    modelValue: {type: Object}
+    modelValue: {type: Object},
+    formData: {type: Object}
   },
   emits: ['update:modelValue'],
   setup(props,ctx) {
@@ -38,6 +39,7 @@ export default defineComponent({
       }
     });
 
+    console.log(props.formData);
     const config = inject("config");
 
     const containerRef = ref(null);
@@ -137,6 +139,7 @@ export default defineComponent({
                            class = {preViewRef.value ? 'block-editing' : ''} // 为什么能覆盖editor-block的::after样式?
                            block = {block}
                            onMousedown = {(e)=> blockMousedown(e, block, index)}
+                           formData = {props.formData}
                            ></EditorBlock>
                          )))
                        }
@@ -144,6 +147,7 @@ export default defineComponent({
                        {markLine.y !== null && <div class="line-y" style={{top: markLine.y + 'px'}}></div>}
                     </div>
                      <div ><ElButton  onClick={() => {closeRef.value = false}}>继续编辑</ElButton></div>
+                     {JSON.stringify(props.formData)}
                      </>
 
                     :
@@ -178,7 +182,12 @@ export default defineComponent({
                       </div>
                       {/* 右侧 */}
                       <div class="editor-right">
-                        <EditorOperate block={lastSelectBlock.value}></EditorOperate>
+                        <EditorOperate
+                         block={lastSelectBlock.value} 
+                         data={data.value} 
+                         updateContainer={commands.commands.updateContainer} 
+                         updateBlock = {commands.commands.updateBlock}
+                         ></EditorOperate>
                       </div>
                       {/* 内容区 */}
                       <div class="editor-container">
@@ -200,6 +209,7 @@ export default defineComponent({
                                   block = {block}
                                   onMousedown = {(e)=> blockMousedown(e, block, index)}
                                   onContextmenu = {(e)=> contextmenuBlock(e, block)}
+                                  formData = {props.formData}
                                   ></EditorBlock>
                                 )))
                               }

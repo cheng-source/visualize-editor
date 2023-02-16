@@ -7,22 +7,32 @@
             "top": 100,
             "left": 100,
             "zIndex": 1,
-            "text": "this is text1",
-            "key": "text"
+            "key": "text",
+            "props": {
+                "text": "this is text1",
+                "color": "red",
+                "size": "14px"
+            }
         },
         {
             "top": 200,
             "left": 200,
             "zIndex": 1,
             "text": "this is text2",
-            "key": "input"
+            "key": "input",
+            "model": {}
         },
         {
             "top": 300,
             "left": 300,
             "zIndex": 1,
             "text": "this is text3",
-            "key": "button"
+            "key": "button",
+            "props": {
+                "text": "初始按钮",
+                "type": "success",
+                "size": "default"
+            }
         }
     ]
 }

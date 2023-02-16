@@ -12,10 +12,7 @@ export function useFocus(data, preViewRef, callback) {
 
     // 最后选中的元素
     const lastSelectBlock = computed(() => data.value.blocks[selectIndex.value]);
-    watch(lastSelectBlock, () => {
-            console.log(lastSelectBlock.value);
-        })
-        // 清空选中的元素
+    // 清空选中的元素
     const clearFocus = () => {
         data.value.blocks.forEach(block => block.focus = false);
     }

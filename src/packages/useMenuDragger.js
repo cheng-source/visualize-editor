@@ -29,6 +29,8 @@ export function useMenuDragger(containerRef, data) {
                     zIndex: 1,
                     key: currentComponent.key,
                     alignCenter: true, // 拖拽的组件的标识，用来在拖拽到目标元素上后使拖拽元素以鼠标为中心
+                    props: {},
+                    model: {}
                 }
             ]
         };

@@ -1,4 +1,4 @@
-import {computed, defineComponent, inject } from "vue";
+import {computed, defineComponent} from "vue";
 
 export const Range = defineComponent({
   props: {
@@ -17,7 +17,6 @@ export const Range = defineComponent({
     });
     const end = computed({
       get() {
-        console.log(props.end);
         return props.end
       },
       set(newValue) {

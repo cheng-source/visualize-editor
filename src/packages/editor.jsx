@@ -39,7 +39,6 @@ export default defineComponent({
       }
     });
 
-    console.log(props.formData);
     const config = inject("config");
 
     const containerRef = ref(null);

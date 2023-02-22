@@ -1,4 +1,5 @@
 import {computed, defineComponent, inject, ref,onMounted, watch} from 'vue';
+import BlockResize from './block-resize';
 export default defineComponent({
   props: {
     block: {type: Object},
@@ -26,25 +27,30 @@ export default defineComponent({
       props.block.height = offsetHeight;
     })
     const component = config.editorConfigMap.get(props.block.key);
-    return ()=> 
-    <div class="editor-block" style={blockStyle.value} ref={blockRef}>
-        {config.editorConfigMap.get(props.block.key).render({
-          props: props.block.props,
-          // model: props.block.model  => {default:'username'}  => {modelValue: FormData.username,"onUpdate:modelValue":v=> FormData.username = v}
-          // model: {
-          //   default: '绑定字段'
-          // }
-          // modelName = default
-          // prev[default] = {modelValue: aaa, }
-          model: Object.keys(component.model || {}).reduce((prev, modelName) => {
-            let propName = props.block.model[modelName];
-            prev[modelName] = {
-              modelValue: props.formData[propName],
-              "onUpdate:modelValue": v => props.formData[propName] = v
-            }
-            return prev
-          }, {})
-        })}
-    </div>
+    return ()=> {
+      const {width, height} = component.resize || {};
+      return    <div class="editor-block" style={blockStyle.value} ref={blockRef}>
+      {config.editorConfigMap.get(props.block.key).render({
+        props: props.block.props,
+        // model: props.block.model  => {default:'username'}  => {modelValue: FormData.username,"onUpdate:modelValue":v=> FormData.username = v}
+        // model: {
+        //   default: '绑定字段'
+        // }
+        // modelName = default
+        // prev[default] = {modelValue: aaa, }
+        model: Object.keys(component.model || {}).reduce((prev, modelName) => {
+          let propName = props.block.model[modelName];
+          prev[modelName] = {
+            modelValue: props.formData[propName],
+            "onUpdate:modelValue": v => props.formData[propName] = v
+          }
+          return prev
+        }, {}),
+        size: props.block.hasResize ? {width: props.block.width, height: props.block.height} : {}
+      })}
+      {props.block.focus && (width || height) && <BlockResize block={props.block} component={component}></BlockResize>}
+  </div>
+    }
+
   }
 }) 

@@ -1,23 +1,13 @@
 # visualize-editor
-<<<<<<< HEAD
-可视化拖拽编辑器
-=======
+启动
+```
+1. git clone
+2. npm install
 
-## Project setup
-```
-npm install
-```
+// 开发环境：
+3. npm run dev
 
-### Compiles and hot-reloads for development
+// 打包出生产环境产物
+4. npm run build
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
->>>>>>> 4c2d2e0 (init)
+项目重难点记录：https://juejin.cn/post/7205527600701341757

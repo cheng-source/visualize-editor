@@ -10,4 +10,3 @@
 // 打包出生产环境产物
 4. npm run build
 ```
-项目重难点记录：https://juejin.cn/post/7205527600701341757

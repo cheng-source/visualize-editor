@@ -1,4 +1,4 @@
-import {computed, defineComponent, inject, onMounted, ref, watch} from 'vue';
+import {computed, defineComponent, inject,  ref} from 'vue';
 import './editor.scss';
 import EditorBlock from './editor-block'
 import { useMenuDragger } from './useMenuDragger';
@@ -42,11 +42,9 @@ export default defineComponent({
     const config = inject("config");
 
     const containerRef = ref(null);
-
     // 左侧菜单组件的拖拽
     const {dragStart,dragend} = useMenuDragger(containerRef, data);
 
-    
     // 获取焦点
     const {blockMousedown,clearFocus,focusData, lastSelectBlock, containerMousedown} = useFocus(data,preViewRef, (e) => {
       mousedown(e)
@@ -107,7 +105,6 @@ export default defineComponent({
                       content: '',
                       footer: true,
                       onConfirm: (text)=> {
-                        debugger
                         commands.commands.updateBlock(JSON.parse(text),block)
                       }
                     })

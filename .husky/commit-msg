@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "\033[34m[commit-msg] 进行 Git 检查\033[0m"
+echo -e "----------------------------------------------------------------------"
+echo -e " 检查当前提交 Git 信息是否符合规范 => type[scope]: subject"
+echo -e " type 是必填项; 表示此次提交的动作类型 build | ci | chore | docs | feat | fix | perf | refactor | revert | style | test"
+echo -e " scope 是可选项; 表示此次提交影响范围; 可以写多个scope (一般使用','进行分隔)"
+echo -e " subject 是必填项; 表示此次提交的简要说明"
+echo -e " 新增功能提交示例：feat: 登陆页面酷炫动画"
+echo -e "----------------------------------------------------------------------"
+npx --no-install commitlint --edit $1
+echo -e "\033[32m[pre-commit] Git 信息检查通过\033[0m"

@@ -2,7 +2,7 @@
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    // type 类型定义
+    // type 类型定义
     'type-enum': [2, 'always', [
       "feat", // 新功能 feature
       "fix", // 修复 bug

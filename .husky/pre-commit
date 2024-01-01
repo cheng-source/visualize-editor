@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
-
+echo -e "\033[34m[pre-commit] 进行 ESLint 检查\033[0m"
+echo "-------------------------------------------------------------------"
+echo " 检查当前提交代码是否通过 ESLint "
+echo " 请检查提交代码里是否存在不符合ESLint规范的代码! "
+echo "-------------------------------------------------------------------"
 npm run lint
-npx --no-install commitlint --edit $1
+echo -e "\033[32m[pre-commit] ESLint 检查通过\033[0m"
+
+# npx --no-install commitlint --edit $1
